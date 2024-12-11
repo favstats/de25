@@ -19,8 +19,8 @@ In collaboration with [Who Targets Me](https://whotargets.me/), we monitored 103
 
 To better understand the election, we kept only advertisers who:
 
-1. Advertised in the last 7 days (25 Nov - 1 Dec 2024)
-2. Advertised in the last 30 days (2 Nov - 1 Dec 2024)
+1. Advertised in the last 7 days (2 Dec - 8 Dec 2024)
+2. Advertised in the last 30 days (9 Nov - 8 Dec 2024)
 
 
 ::: {.callout-note}
