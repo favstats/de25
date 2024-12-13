@@ -14,7 +14,7 @@ website:
         text: "{{< iconify ph coins >}} Spending"
       - sidebar:targeting
       - href: ai.qmd
-        text: "{{< iconify star-four-light >}} AI (WIP)"
+        text: "{{< iconify ph star-four-light >}} AI (WIP)"
       - href: about.qmd
         text: "{{< iconify ph info-thin >}} About"
   sidebar:
