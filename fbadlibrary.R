@@ -80,33 +80,41 @@ cat("\n\nFB Data: Getting it\n\n")
 
 # readRenviron(".Renviron")
 
+
+#https://www.facebook.com/ads/library/?id=834574491308456
+#ads_archive?fields=ad_creative_bodies,ad_delivery_start_time,ad_delivery_stop_time&ad_reached_countries=['DE']&ad_type=POLITICAL_AND_ISSUE_ADS&ad_delivery_date_min=2023-06-01&ad_delivery_date_max=2023-09-01&limit=100&pretty=0&search_page_ids=['540404695989874']
+
+#define fields you are interested in
+search_fields=c("id", "ad_creation_time", "ad_delivery_start_time", "ad_delivery_stop_time",
+                "ad_creative_bodies", 
+                "ad_creative_link_captions",
+                "ad_creative_link_titles",
+                "ad_creative_link_descriptions",
+                "page_id",
+                "page_name",
+                "ad_snapshot_url",
+                "publisher_platforms",
+                "spend",
+                "impressions",
+                "estimated_audience_size",
+                "eu_total_reach",
+                "bylines",
+                "beneficiary_payers",
+                "target_ages",
+                "target_gender",
+                "target_locations",
+                "age_country_gender_reach_breakdown",
+                "delivery_by_region",
+                "demographic_distribution") %>% 
+  stringr::str_c(., collapse=", ")
+
 token <- Sys.getenv("fb_token")
 
 #link to fb api
 my_link<- "https://graph.facebook.com"
 
-#define fields you are interested in
-search_fields=c("ad_creation_time", 
-                "ad_delivery_start_time",
-                "ad_delivery_stop_time",
-                "ad_creative_link_caption",
-                "ad_creative_link_description",
-                "ad_creative_link_title",
-                "currency",
-                "ad_creative_body", 
-                "page_id",
-                "page_name",
-                "spend",
-                "ad_snapshot_url",
-                "demographic_distribution",
-                "funding_entity",
-                "potential_reach",
-                "publisher_platforms",
-                "impressions",
-                "region_distribution") %>% 
-  stringr::str_c(., collapse=", ")
 
-min_date <- "2023-05-26"
+min_date <- "2024-01-01"
 
 #get the data from the first 'page' of data the api provides
 page_one_response <- GET(my_link,
@@ -117,7 +125,7 @@ page_one_response <- GET(my_link,
                                       search_terms="''",
                                       ad_delivery_date_min = min_date,
                                       fields=search_fields,
-                                      ad_reached_countries="US"))
+                                      ad_reached_countries="DE"))
 page_one_content<- content(page_one_response)
 
 x <- tibble(data=page_one_content$data)
