@@ -313,6 +313,64 @@ hchart(
 ## Content Exploring
 
 
+  
+
+::: {.gallery}
+
+<!-- #2585232091623704-adid -->
+
+<div class="gallery-item">
+
+<img src="AI_CDU.jpg" alt="Image 1"/>
+
+<p class="description">
+
+-   **Views:** 10,000<br>
+
+    -   **Money Spent on Ad:** \$500<br>
+    -   **People Targeted:** 25,000
+
+    </p>
+
+    </div>
+
+<!-- # 1024684215458526 ad id -->
+
+<div class="gallery-item">
+
+<img src="Afd_oma.png" alt="Image 2"/>
+
+<p class="description">
+
+-   **Views:** 8,500<br>
+
+    -   **Money Spent on Ad:** \$350<br>
+    -   **People Targeted:** 20,000
+
+    </p>
+
+    </div>
+
+<!-- # ad id 808709021104029 -->
+
+<div class="gallery-item">
+
+<img src="ai_generated_dog.jpg" alt="Image 3"/>
+
+<p class="description">
+
+-   **Views:** 15,000<br>
+
+    -   **Money Spent on Ad:** \$750<br>
+    -   **People Targeted:** 30,000
+
+    </p>
+
+    </div>
+
+:::
+
+
 
 ## Methodology
 
