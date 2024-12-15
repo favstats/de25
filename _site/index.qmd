@@ -39,6 +39,16 @@ aidat <- aidat %>%
 
 ```
 
+<!-- ### CampAIgn Tracker -->
+
+<!-- Welcome to the **CampAIgn Tracker**, your go-to platform for monitoring the use of AI-generated content in political campaigns. *For now*, our analysis focuses on *paid ads on Meta platorms* from official Germany party accounts providing insights into targeting strategies, spending patterns, and **the prevalence of AI-generated visuals and messages**.  -->
+
+
+
+
+
+
+
 
 
 ::: {.panel-tabset}
@@ -320,7 +330,7 @@ hchart(
 
 ## Content Exploring
 
-  
+This only shows the top 3 ads in terms of impressions but future versions will include a browsable table!
 
 ::: {.gallery}
 
@@ -378,7 +388,7 @@ hchart(
 
 -   **Impressions:** 100 000<br>
 
--   **Total Spend:** 400 €<br>
+-   **Total Spend:** 500 €<br>
 
 -   **Target Gender:** Men<br>
 -   **Target Age:** All <br>

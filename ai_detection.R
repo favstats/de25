@@ -199,12 +199,12 @@ hl %>%
   bind_rows(h2) %>% 
   bind_rows(h3) %>% 
   mutate(ai = ifelse(is.na(ai), 0, ai)) %>%
-  ggplot(aes(as.character(ai), ai_generated)) +
-  geom_boxplot()
-  mutate(pred = ifelse(ai_generated >= 0.5, 1, 0)) %>% 
+  # ggplot(aes(as.character(ai), ai_generated)) +
+  # geom_boxplot()
+  mutate(pred = ifelse(ai_generated >= 0.5, 1, 0)) %>%
   mutate(pred = as.factor(pred)) %>% 
   mutate(ai = as.factor(ai)) %>% 
-  yardstick::accuracy(ai, pred)
+  yardstick::recall(ai, pred)
 
  
 aiclass %>% View()
