@@ -116,7 +116,7 @@ generate_summary_boxes <- function(data) {
   # AI Content Section
   ai_boxes <- tagList(
     custom_value_box(
-      "Unique Ads",
+      "FB & Instagram Ads",
       format_large_number(summary_data$unique_ads[1]),
       "#d9edf7" # Light blue for unique ads
     ),
@@ -137,7 +137,7 @@ generate_summary_boxes <- function(data) {
   # Non-AI Content Section
   non_ai_boxes <- tagList(
     custom_value_box(
-      "Unique Ads",
+      "FB & Instagram Ads",
       format_large_number(summary_data$unique_ads[2]),
       "#d9edf7"
     ),
@@ -178,6 +178,8 @@ generate_summary_boxes(aidat)
 <center>
 
 *Timeframe: January 1st - December 13th 2024*
+
+Source: Meta Ad Library. We retrieved all *paid ads* from 160+ *official* German party accounts.
 
 </center>
 
