@@ -14,14 +14,14 @@ services:
     volumes:
       - ollama:/root/.ollama
     # GPU support (turn off by commenting with # if you don't have an nvidia gpu)
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities:
-                - gpu
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities:
+    #             - gpu
 
   # webui, nagivate to http://localhost:3000/ to use
   open-webui:

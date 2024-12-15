@@ -1,5 +1,5 @@
 ---
-title: Spending
+title: Overall Spending
 description-meta: "How do political parties chase your vote, what do they want to keep hidden, and how much money do they spend on it? In the lead-up to the elections, we monitor political microtargeting."
 format: 
   html:
@@ -317,7 +317,9 @@ eval(parse(text = paste0("gt(the_table7, rowname_col = 'party_col') %>% fmt_mark
 
 ## Google
 
-```{r}
+Work in Progress
+
+```{r, eval=F}
 # library(metatargetr)
 
 Romania_2024_google <- read_csv(here::here("data/Romania 2024 - google.csv"))

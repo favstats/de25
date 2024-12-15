@@ -3,18 +3,14 @@ project:
   output-dir: ../docs
 
 website:
-  title: "Who Targets Me - Germany"
+  title: "CampAIgn Tracker"
   favicon: "wtm_logo_2020_transparent-150x150.png"
   navbar:
     logo: "wtm_logo_2020_transparent-300x300.png"
     left:
-      - href: index.qmd
-        text: "{{< iconify ph note >}} Blog"
-      - href: spending.qmd
-        text: "{{< iconify ph coins >}} Spending"
-      - sidebar:targeting
       - href: ai.qmd
-        text: "{{< iconify ph star-four-light >}} AI (WIP)"
+        text: "{{< iconify ph star-four-light >}} AI Political Content Tracker"
+      - sidebar:targeting
       - href: about.qmd
         text: "{{< iconify ph info-thin >}} About"
   sidebar:
@@ -24,6 +20,7 @@ website:
       style: "docked"
       collapse-level: 2
       contents:
+        - spending.qmd
         - targeting.qmd
         - detailed.qmd
         - location.qmd

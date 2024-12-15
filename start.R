@@ -6,7 +6,7 @@ if (Sys.info()[["effective_user"]] == "favstats" | Sys.info()[["effective_user"]
 }
 
 
-pacman::p_load(knitr, tidyverse, openxlsx, sf, rmarkdown, rvest)
+pacman::p_load(knitr, tidyverse, openxlsx, rmarkdown, rvest)
 # setwd("C:/Users/fabio/Dropbox/postdoc/microdashboards/wtm_iq/")
 # setwd("..")
 # print(getwd())
@@ -15,15 +15,16 @@ render_it <- function(...) {
   thefile <- str_remove(..., "_site/") %>% str_replace("qmd", "html")
   if(any(str_detect(..., "map"))){
     if(cntryy == "NL"){
-      quarto::quarto_render(..., quiet = T)
+      quarto::quarto_render(..., quiet = F)
     }
   } else {
     # print(thefile)
-    quarto::quarto_render(..., quiet = T)
+    quarto::quarto_render(..., quiet = F)
   }
   
 }
-render_it <- possibly(render_it, otherwise = NULL, quiet = F)
+
+render_it <- possibly(render_it, otherwise = NULL)
 dir("_site", full.names = T) %>% keep(~str_detect(.x, "qmd")) %>% keep(~str_detect(.x, "qmd")) %>% walk(render_it)
 
 
