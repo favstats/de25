@@ -390,7 +390,7 @@ This only shows the top 3 ads in terms of impressions but future versions will i
 
 -   **Total Spend:** 500 €<br>
 
--   **Target Gender:** Men<br>
+-   **Target Gender:** Mixed<br>
 -   **Target Age:** All <br>
 -   **Target Location:** Brandenburg <br>
 
