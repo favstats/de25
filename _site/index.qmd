@@ -320,57 +320,72 @@ hchart(
 
 ## Content Exploring
 
-WIP!
   
 
 ::: {.gallery}
 
 <!-- #2585232091623704-adid -->
 
+
 <div class="gallery-item">
 
-<img src="AI_CDU.jpg" alt="Image 1"/>
+<img src="https://i.imgur.com/MIAnb4S.png" alt="Bild 1"/>
 
 <p class="description">
 
--   **Views:** 10,000<br>
+-   **Impressionen:** 125 000 <br>
 
--   **Money Spent on Ad:** \$500<br>
--   **People Targeted:** 25,000
+-   **Total Spend:** 500 €<br>
+
+
+-   **Target Gender:** Women<br>
+-   **Target Age:** All <br>
+-   **Target Location:** Brandenburg <br>
+
+[More info on the ad: Ad Library Link](https://www.facebook.com/ads/library/?active_status=active&ad_type=political_and_issue_ads&country=DE&is_targeted_country=false&media_type=all&q=2585232091623704&search_type=keyword_unordered)
 
 </p>
 
 </div>
 
-<!-- # 1024684215458526 ad id -->
 
 <div class="gallery-item">
 
-<img src="Afd_oma.png" alt="Image 2"/>
+<img src="https://i.imgur.com/pSl9bjt.png" alt="Bild 2"/>
 
 <p class="description">
 
--   **Views:** 8,500<br>
+-   **Impressions:** 120 500<br>
 
--   **Money Spent on Ad:** \$350<br>
--   **People Targeted:** 20,000
+-   **Total Spend:** 1300 €<br>
+
+-   **Target Gender:** Men<br>
+-   **Target Age:** All <br>
+-   **Target Location:** Brandenburg <br>
+
+[More info on the ad: Ad Library Link](https://www.facebook.com/ads/library/?active_status=active&ad_type=political_and_issue_ads&country=DE&is_targeted_country=false&media_type=all&q=1024684215458526&search_type=keyword_unordered)
+
 
 </p>
 
 </div>
 
-<!-- # ad id 808709021104029 -->
-
 <div class="gallery-item">
 
-<img src="ai_generated_dog.jpg" alt="Image 3"/>
+<img src="https://i.imgur.com/ocrCnnd.png" alt="Bild 3"/>
 
 <p class="description">
 
--   **Views:** 15,000<br>
+-   **Impressions:** 100 000<br>
 
--   **Money Spent on Ad:** \$750<br>
--   **People Targeted:** 30,000
+-   **Total Spend:** 400 €<br>
+
+-   **Target Gender:** Men<br>
+-   **Target Age:** All <br>
+-   **Target Location:** Brandenburg <br>
+
+[More info on the ad: Ad Library Link](https://www.facebook.com/ads/library/?active_status=active&ad_type=political_and_issue_ads&country=DE&is_targeted_country=false&media_type=all&q=808709021104029&search_type=keyword_unordered)
+
 
 </p>
 
@@ -458,12 +473,12 @@ h1, h2 {
 <div class="section-container">
   <h2>Bald verfügbar</h2>
   <p>
-    Wir erweitern unseren <strong>CampAIgn Tracker</strong> kontinuierlich und werden bald nicht nur offizielle Partei-Accounts inkludieren, sondern <strong>60.000 weitere Accounts</strong> von politischen Akteuren in Deutschland. So ermöglichen wir ein <strong>Live-Tracking von KI-Inhalten</strong> bei den nächsten Wahlen.
+    Wir erweitern unseren <strong>CampAIgn Tracker</strong> kontinuierlich und werden bald nicht nur offizielle Partei-Accounts inkludieren, sondern <strong>60.000 weitere Accounts</strong> von politischen Akteur:innen in Deutschland. So ermöglichen wir ein <strong>Live-Tracking von KI-Inhalten</strong> bei den nächsten Wahlen.
   </p>
 </div>
 
 <div class="section-container button-container">
-  <a href="mailto:research@yourorganization.de" class="button">Kontaktieren Sie unsere Wissenschaftler!</a>
+  <a href="mailto:research@yourorganization.de" class="button">Kontaktieren Sie unsere Wissenschaftler:innen!</a>
 </div>
 
 
