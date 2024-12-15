@@ -8,11 +8,9 @@ website:
   navbar:
     logo: "wtm_logo_2020_transparent-300x300.png"
     left:
-      - href: ai.qmd
+      - href: index.qmd
         text: "{{< iconify ph star-four-light >}} AI Political Content Tracker"
       - sidebar:targeting
-      - href: about.qmd
-        text: "{{< iconify ph info-thin >}} About"
   sidebar:
     - id: ""
     - id: targeting
