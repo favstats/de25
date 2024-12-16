@@ -163,8 +163,8 @@ get_page_insights <- function (pageid, timeframe = "LAST_30_DAYS", lang = "en-GB
 # 
 # library(metatargetr)
 
-if(Sys.info()[["sysname"]]=="Windows"){
-  ### CHANGE ME WHEN LOCAL!
+if (Sys.info()[["effective_user"]] == "favstats" | Sys.info()[["effective_user"]] == "favoo") {
+### CHANGE ME WHEN LOCAL!
   tf <- "30"
 }
 
