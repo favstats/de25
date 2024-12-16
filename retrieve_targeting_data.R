@@ -684,14 +684,14 @@ mark_list <- us_markers %>%
     return(the_data)
   }) 
 
-mark_list[[1]] %>% 
-  filter(page_id == "380605622501418")
-
-mark_list[[2]] %>% 
-  filter(page_id == "380605622501418")
-
-the_data %>% 
-  filter(page_id == "380605622501418")
+# mark_list[[1]] %>% 
+#   filter(page_id == "380605622501418")
+# 
+# mark_list[[2]] %>% 
+#   filter(page_id == "380605622501418")
+# 
+# the_data %>% 
+#   filter(page_id == "380605622501418")
 
 # get_page_insights("153080620724", timeframe = "LAST_30_DAYS", include_info = "targeting_info") %>%
 #   as_tibble()
