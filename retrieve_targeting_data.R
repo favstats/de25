@@ -56,6 +56,7 @@ get_page_insights <- function (pageid, timeframe = "LAST_30_DAYS", lang = "en-GB
     
     if (!(Sys.info()[["effective_user"]] %in% c("fabio", "favstats"))) {
       beepr::beep(20)
+      print("hello")
       readline("Change VPN pls")
       out <- resp %>% httr2::resp_body_html() %>% rvest::html_element("p") %>% 
         rvest::html_text() %>% str_split_1("(?<=\\})\\s*(?=\\{)") %>% 
@@ -632,6 +633,8 @@ mark_list <- us_markers %>%
                                         "last_30_days"))) %>% 
   arrange(tframe) %>% 
   filter(str_detect(tframe, "90_days", negate =T)) %>% 
+  # filter(str_detect(tframe, "30_days", negate =T)) %>% 
+  
   # slice(1) %>%
   # sample_n(10) %>% 
   # mutate(ds = as.Date(ds)) %>% 
