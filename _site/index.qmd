@@ -13,7 +13,7 @@ format:
 library(tidyverse)
 library(htmltools)
 
-knitr::opts_chunk$set(echo = F, message = F)
+knitr::opts_chunk$set(echo = F, message = F, warning = F)
 
 # sets <- jsonlite::fromJSON(here::here("settings.json"))
 
