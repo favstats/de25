@@ -114,7 +114,8 @@ scrape_ads <- function(page_id){
   my_link<- "https://graph.facebook.com"
   
   
-  min_date <- "2024-01-01"
+  min_date <- "2021-07-26"
+  max_date <- "2021-09-26"
   
   #get the data from the first 'page' of data the api provides
   page_one_response <- GET(my_link,
@@ -125,6 +126,7 @@ scrape_ads <- function(page_id){
                                         ad_active_status="ALL",
                                         search_terms="''",
                                         ad_delivery_date_min = min_date,
+                                        ad_delivery_date_max = max_date,
                                         fields=search_fields,
                                         ad_reached_countries="DE"))
   page_one_content<- content(page_one_response)
@@ -168,94 +170,161 @@ readem <- possibly(openxlsx::read.xlsx, otherwise = NULL, quiet = F)
 # 
 # pla  %>% View()
 
-read_lines("ids.txt") %>% 
-  .[str_detect(.,"47694585682")]
+# read_lines("ids.txt") %>% 
+#   .[str_detect(.,"47694585682")]
+# 
+# fb_dat2 %>% 
+#   bind_rows(fb_dat3) %>% 
+#   distinct(id, .keep_all = T)
+# 
+# # fb_dat3 %>% 
+# #   filter(page_id == "47694585682")
+# c("558754197477014", "205311826175998", "150480805043795", "329900923869212", 
+#   "152934608113175", "207429192606075", "112326918787579", "159841780842315", 
+#   "2314697952137400", "189184071108491", "1925065844440080", "1179148932288130", 
+#   "111080175616050", "22865297210", "109903507414389", "116516342039001", 
+#   "100752078468444", "194593423966954", "273693286086433", "338480852961658", 
+#   "109460782417586", "351947321504088", "51468018860", "100935615110463", 
+#   "320113161194855", "104467191275254", "108185017409", "459077044164282", 
+#   "162707793881819", "189449641081486", "330165526782", "105244217494187", 
+#   "499359010093513", "192845187848390", "1389842358009230", "189006054445407", 
+#   "358718334000015", "102026331696494", "177407194382621", "386287537891336", 
+#   "188344874511758", "363842953730453", "171337982904329", "106637900016", 
+#   "244663365404847", "101851171870892", "107652469330889", "166174613410024", 
+#   "165381593630826", "151013658351935", "1608463192727450", "164131966966839", 
+#   "105330431358412", "217013861665887", "570893299597210", "241400009229424", 
+#   "219603204762238", "2124429831016390", "690975797779447")  %>% 
+#   .[str_detect(.,"81386795687")] 
+# 
+# read_lines("ids.txt") %>% .[str_detect(.,"47217143218")]
+# 
+# read_lines("ids.txt") %>% 
+#   tibble(page_id = .) %>% 
+#   # filter(!(page_id %in% fb_dat2$page_id)) %>% 
+#   filter(page_id == "81386795687")
 
-fb_dat2 %>% 
-  bind_rows(fb_dat3) %>% 
-  distinct(id, .keep_all = T)
+read_em <- possibly( openxlsx::read.xlsx, otherwise = tibble(a = NULL), quiet = T)
 
-# fb_dat3 %>% 
-#   filter(page_id == "47694585682")
-c("558754197477014", "205311826175998", "150480805043795", "329900923869212", 
-  "152934608113175", "207429192606075", "112326918787579", "159841780842315", 
-  "2314697952137400", "189184071108491", "1925065844440080", "1179148932288130", 
-  "111080175616050", "22865297210", "109903507414389", "116516342039001", 
-  "100752078468444", "194593423966954", "273693286086433", "338480852961658", 
-  "109460782417586", "351947321504088", "51468018860", "100935615110463", 
-  "320113161194855", "104467191275254", "108185017409", "459077044164282", 
-  "162707793881819", "189449641081486", "330165526782", "105244217494187", 
-  "499359010093513", "192845187848390", "1389842358009230", "189006054445407", 
-  "358718334000015", "102026331696494", "177407194382621", "386287537891336", 
-  "188344874511758", "363842953730453", "171337982904329", "106637900016", 
-  "244663365404847", "101851171870892", "107652469330889", "166174613410024", 
-  "165381593630826", "151013658351935", "1608463192727450", "164131966966839", 
-  "105330431358412", "217013861665887", "570893299597210", "241400009229424", 
-  "219603204762238", "2124429831016390", "690975797779447")  %>% 
-  .[str_detect(.,"81386795687")] 
 
-read_lines("ids.txt") %>% .[str_detect(.,"47217143218")]
-
-read_lines("ids.txt") %>% 
-  tibble(page_id = .) %>% 
-  # filter(!(page_id %in% fb_dat2$page_id)) %>% 
-  filter(page_id == "81386795687")
-
-tabelle2 <- read_csv("data/PolitischeAkteure_Bundesländer.xlsx - Tabelle2.csv") %>% 
-  janitor::clean_names() %>% 
-  select(partei, land, id)
-
-fb_dat3 <-tabelle2$id %>% 
-  tibble(page_id = .) %>% 
-  # filter(!(page_id %in% fb_dat2$page_id)) %>% 
-  distinct(page_id) %>%
-  pull(page_id) %>% 
+all_profiles <- 1:200 %>% 
   map_dfr(~{
-    scrape_ads2(.x)
-  }) 
+    # print("Influencer")
+    read_em("data/AccountSammlung_Influencer.xlsx", sheet = .x) %>%  janitor::clean_names() %>% mutate_all(as.character) 
+  }) %>% 
+  bind_rows(
+    1:200  %>% 
+      map_dfr(~{
+        # print("Medien")
+        read_em("data/AccountSammlung_Medien.xlsx", sheet = .x) %>%  janitor::clean_names() %>% mutate_all(as.character) 
+      })      
+  )  %>% 
+  bind_rows(
+    1:200  %>% 
+      map_dfr(~{
+        # print("Pol")
+        read_em("data/AccountSammlung_Politik.xlsx", sheet = .x) %>%  janitor::clean_names() %>% mutate_all(as.character) 
+      })      
+  ) %>% 
+  bind_rows(
+    1:200  %>% 
+      map_dfr(~{
+        # print("Sonst")
+        
+        read_em("data/AccountSammlung_Sonstige.xlsx", sheet = .x) %>%  janitor::clean_names() %>% mutate_all(as.character)
+      })      
+  ) %>% 
+  bind_rows(
+    1:200  %>% 
+      map_dfr(~{
+        # print("Unternehm")
+        
+        read_em("data/AccountSammlung_Unternehmen.xlsx", sheet = .x) %>%  janitor::clean_names() %>% mutate_all(as.character) 
+      })      
+  )
 
-fb_dat3 %>% filter(page_id == "47217143218")
+extract_id_from_dataset <- function(data, url_column) {
+  data %>%
+    mutate(
+      id = str_extract({{url_column}}, "(?<=id=)[^&]+")
+    )
+}
 
-fb_dat <- fb_dat %>% 
-  bind_rows(scrape_ads2("81386795687")) %>% 
-  distinct(id, .keep_all = T)
+options(scipen = 999)
 
-saveRDS(fb_dat, file = "data/fb_dat.rds")
-# fb
+all_profile_ids <- all_profiles %>% 
+  drop_na(facebook_id) %>% 
+  as_tibble() %>% 
+  mutate(facebook_id = as.numeric(facebook_id)) %>% 
+  extract_id_from_dataset(facebook_url) %>% 
+  mutate(id2 = str_remove(facebook_url, "https://www.facebook.com/")) %>% 
+  mutate(facebook_id = ifelse(is.na(facebook_id), id, facebook_id)) %>%  
+  mutate(facebook_id = ifelse(is.na(facebook_id), id2, facebook_id)) %>% 
+  mutate(facebook_id = as.numeric(facebook_id)) %>% 
+  # mutate(id2 = extract_id(facebook_url)) %>% View()
+  # count(id, sort = T) 
+  distinct(facebook_id, .keep_all = T) %>% 
+  drop_na(facebook_id) %>% 
+  filter(facebook_id > 100)
 
-scrape_ads2("47217143218")
-fb_dat %>% filter(id == "802024048102983")
-fb_dat2 %>% filter(id == "802024048102983")
-
-fb_dat3
-
-read_lines("ids.txt") %>% 
-  tibble(page_id = .) %>% 
-  filter(!(page_id %in% fb_dat2$page_id)) %>% 
-  distinct(page_id) %>%
-  pull(page_id) %>% dput()
-
-scrape_ads("558754197477014")
-
-the_ids <- read_lines("ids.txt")
-
-fb_dat2 %>% 
-  filter(!(id %in% the_ids)) %>% 
-  distinct(id, .keep_all = T) 
-
-fb_dat3 %>% 
-  filter(page_id == "81386795687")
-
-scrape_ads2("81386795687")
-
-fb_dat2 <- read_lines("ids.txt") %>% 
-  # .[1] %>% 
+saveRDS(all_profile_ids, file = "data/all_profile_ids.rds")
+# 
+# tabelle2 <- read_csv("data/PolitischeAkteure_Bundesländer.xlsx - Tabelle2.csv") %>% 
+#   janitor::clean_names() %>% 
+#   select(partei, land, id)
+# 
+# fb_dat3 <-tabelle2$id %>% 
+#   tibble(page_id = .) %>% 
+#   # filter(!(page_id %in% fb_dat2$page_id)) %>% 
+#   distinct(page_id) %>%
+#   pull(page_id) %>% 
+#   map_dfr(~{
+#     scrape_ads2(.x)
+#   }) 
+# 
+# tabelle3
+# 
+# fb_dat3 %>% filter(page_id == "47217143218")
+# 
+# fb_dat <- fb_dat %>% 
+#   bind_rows(scrape_ads2("81386795687")) %>% 
+#   distinct(id, .keep_all = T)
+# 
+# saveRDS(fb_dat, file = "data/fb_dat.rds")
+# # fb
+# 
+# scrape_ads2("47217143218")
+# fb_dat %>% filter(id == "802024048102983")
+# fb_dat2 %>% filter(id == "802024048102983")
+# 
+# fb_dat3
+# 
+# read_lines("ids.txt") %>% 
+#   tibble(page_id = .) %>% 
+#   filter(!(page_id %in% fb_dat2$page_id)) %>% 
+#   distinct(page_id) %>%
+#   pull(page_id) %>% dput()
+# 
+# scrape_ads("558754197477014")
+# 
+# the_ids <- read_lines("ids.txt")
+# 
+# fb_dat2 %>% 
+#   filter(!(id %in% the_ids)) %>% 
+#   distinct(id, .keep_all = T) 
+# 
+# fb_dat3 %>% 
+#   filter(page_id == "81386795687")
+# 
+# scrape_ads2("81386795687")
+# 
+fb_dat <- all_profile_ids$facebook_id %>%
+  # .[1] %>%
   map_dfr(scrape_ads2, .progress = T)
 
-saveRDS(fb_dat3, file = "data/fb_dat.rds")
- 
+saveRDS(fb_dat, file = "data/fb_dat_all_profiles.rds")
+#  
 
-
+fb_dat <- readRDS("data/fb_dat_all_profiles.rds")
 
 
 
