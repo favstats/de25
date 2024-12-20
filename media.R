@@ -28,7 +28,7 @@ hash_table <- read_csv("data/media/hash_table.csv")
 #   distinct()
 ###
 
-ips_targeting <- read_lines("ips-targeting.txt")
+# ips_targeting <- read_lines("ips-targeting.txt")
 
 
 
@@ -43,59 +43,59 @@ get_proxy_user <- function(prxs) {
 # Define a function to get page insights
 
   
-# Function to get media data with httr2 and proxy integration
-get_media <- function(ad_id, download = FALSE, mediadir = "data/media", hashing = FALSE) {
-  # Construct the URL
-  
-  
-  
-  prx <- sample(ips_targeting, 1)
-  prxs <- stringr::str_split(prx, "(?<=\\d)\\:", n = 2)
-  
-  url <- glue::glue("https://www.facebook.com/ads/library/?id={ad_id}")
-  
-  # Retrieve proxy and user credentials
-  proxy <- get_proxy(prxs)
-  userpw <- get_proxy_user(prxs)
-  
-  # Perform the HTTP GET request using httr2
-  response <- httr2::request(url) %>% 
-    httr2::req_headers(
-      `User-Agent` = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-      `Accept` = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-    ) %>%
-    httr2::req_proxy(
-      url = proxy[1],
-      port = as.numeric(proxy[2]),
-      username = userpw[1],
-      password = userpw[2]
-    ) %>%
-    httr2::req_perform()
-  
-  # Extract raw HTML content
-  html_raw <- response %>% httr2::resp_body_string()
-  
-  # Extract relevant script containing snapshot
-  script_seg <- stringr::str_extract_all(html_raw, "<script.*?>.*?</script>") %>% 
-    unlist() %>% 
-    .[stringr::str_detect(., "snapshot")]
-  
-  # Convert the extracted script into JSON format
-  dataasjson <-  metatargetr:::detectmysnap(script_seg)
-  
-  # Perform final data conversion and add ad_id
-  fin <- dataasjson %>% metatargetr::stupid_conversion() %>% dplyr::mutate(id = ad_id)
-  
-  # Download media if requested
-  if (download) {
-    fin %>% metatargetr::download_media(mediadir = mediadir, hashing)
-  }
-  
-  return(fin)
-}
-
-debugonce(get_media)
-get_media("3107592112807842", download = T, hashing = T, mediadir = "data/media")
+# # Function to get media data with httr2 and proxy integration
+# get_media <- function(ad_id, download = FALSE, mediadir = "data/media", hashing = FALSE) {
+#   # Construct the URL
+#   
+#   
+#   
+#   prx <- sample(ips_targeting, 1)
+#   prxs <- stringr::str_split(prx, "(?<=\\d)\\:", n = 2)
+#   
+#   url <- glue::glue("https://www.facebook.com/ads/library/?id={ad_id}")
+#   
+#   # Retrieve proxy and user credentials
+#   proxy <- get_proxy(prxs)
+#   userpw <- get_proxy_user(prxs)
+#   
+#   # Perform the HTTP GET request using httr2
+#   response <- httr2::request(url) %>% 
+#     httr2::req_headers(
+#       `User-Agent` = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+#       `Accept` = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+#     ) %>%
+#     httr2::req_proxy(
+#       url = proxy[1],
+#       port = as.numeric(proxy[2]),
+#       username = userpw[1],
+#       password = userpw[2]
+#     ) %>%
+#     httr2::req_perform()
+#   
+#   # Extract raw HTML content
+#   html_raw <- response %>% httr2::resp_body_string()
+#   
+#   # Extract relevant script containing snapshot
+#   script_seg <- stringr::str_extract_all(html_raw, "<script.*?>.*?</script>") %>% 
+#     unlist() %>% 
+#     .[stringr::str_detect(., "snapshot")]
+#   
+#   # Convert the extracted script into JSON format
+#   dataasjson <-  metatargetr:::detectmysnap(script_seg)
+#   
+#   # Perform final data conversion and add ad_id
+#   fin <- dataasjson %>% metatargetr::stupid_conversion() %>% dplyr::mutate(id = ad_id)
+#   
+#   # Download media if requested
+#   if (download) {
+#     fin %>% metatargetr::download_media(mediadir = mediadir, hashing)
+#   }
+#   
+#   return(fin)
+# }
+# 
+# debugonce(get_media)
+# get_media("3107592112807842", download = T, hashing = T, mediadir = "data/media")
 
 already_there <- hash_table$ad_id %>%
   str_remove_all("adid_") %>%
