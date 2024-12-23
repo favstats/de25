@@ -16,7 +16,7 @@
 # 
 # # print("hello")
 # 
-sets <- jsonlite::fromJSON("settings.json")
+# sets <- jsonlite::fromJSON("settings.json")
 # 
 # # sets$cntry <- "NP"
 # 

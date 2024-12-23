@@ -209,7 +209,7 @@ if (Sys.info()[["effective_user"]] == "favstats" | Sys.info()[["effective_user"]
   tf <- "30"
 }
 
-jb <- get_page_insights("103875099042033", timeframe = glue::glue("LAST_90_DAYS"), include_info = "targeting_info") %>% as_tibble()
+jb <- get_page_insights("103875099042033", timeframe = glue::glue("LAST_7_DAYS"), include_info = "targeting_info") %>% as_tibble()
 
 new_ds <- jb %>% arrange(ds) %>% slice(1) %>% pull(ds)
 
@@ -693,33 +693,33 @@ mark_list <- us_markers %>%
     arethesepagespresent <<- the_data %>% 
       filter(page_id %in% unique(last7$page_id)[1:1000])
     
-    if(length(unique(arethesepagespresent$page_id))<1000){
-      try({
-        
-        print("djt not found")
-        djt_page <<- unique(last7$page_id) %>%
-          setdiff(the_data$page_id) %>%
-          # djt_page <<- "380605622501418" %>% 
-          map_dfr_progress(
-            ~{get_page_insights(.x, timeframe = thetframe, include_info = "targeting_info")},
-            .progress = T
-          ) %>%
-          as_tibble() %>%
-          # select(-page_name, -party, -remove_em) %>%
-          left_join(all_dat) %>%
-          mutate(tframe = parse_number(as.character(.x$tframe))) %>%
-          mutate(total_spend_formatted = parse_number(as.character(total_spend_formatted)))
-        
-        the_data <- djt_page %>%
-          bind_rows(the_data)
-        
-        present_now <- the_data %>% 
-          inner_join(arethesepagespresent %>% select(page_id)) %>% 
-          distinct(page_id)
-        
-        print(nrow(present_now))
-      })
-    }
+    # if(length(unique(arethesepagespresent$page_id))<1000){
+    #   try({
+    #     
+    #     print("djt not found")
+    #     djt_page <<- unique(last7$page_id) %>%
+    #       setdiff(the_data$page_id) %>%
+    #       # djt_page <<- "380605622501418" %>% 
+    #       map_dfr_progress(
+    #         ~{get_page_insights(.x, timeframe = thetframe, include_info = "targeting_info")},
+    #         .progress = T
+    #       ) %>%
+    #       as_tibble() %>%
+    #       # select(-page_name, -party, -remove_em) %>%
+    #       left_join(all_dat) %>%
+    #       mutate(tframe = parse_number(as.character(.x$tframe))) %>%
+    #       mutate(total_spend_formatted = parse_number(as.character(total_spend_formatted)))
+    #     
+    #     the_data <- djt_page %>%
+    #       bind_rows(the_data)
+    #     
+    #     present_now <- the_data %>% 
+    #       inner_join(arethesepagespresent %>% select(page_id)) %>% 
+    #       distinct(page_id)
+    #     
+    #     print(nrow(present_now))
+    #   })
+    # }
     
     
     
