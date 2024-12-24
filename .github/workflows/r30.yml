@@ -1,4 +1,4 @@
-name: "7 Timeframe"
+name: "Dashboard"
 on:
   schedule:
     # Runs "at minute 55 past every hour" (see https://crontab.guru)
@@ -57,6 +57,43 @@ jobs:
           install.packages('gtExtras')
           install.packages('httr2')
         shell: Rscript {0}
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 1
+          needs: |
+            any::tidyverse
+            any::httr
+            any::remotes
+            any::shiny
+            any::scales
+            any::treemap
+            any::here
+            any::jsonlite
+            any::janitor
+            any::quarto
+            any::highcharter
+            any::lubridate
+            any::gt
+            any::gtExtras
+            any::pacman
+            any::openxlsx
+            any::sf
+            any::xml2
+            any::rvest
+            any::reticulate
+            any::fs
+            any::countrycode
+            any::progress
+            any::cli
+            any::digest
+            any::glue
+            any::vroom
+            any::prettydoc
+            any::DT
+            any::piggyback
+            any::httr2
+            any::openssl
+            any::priceR
       - name: "Script - Update Dashboard"
         run: Rscript 'start.R'
       - name: "Commit"
