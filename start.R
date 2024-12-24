@@ -6,7 +6,7 @@ if (Sys.info()[["effective_user"]] == "favstats" | Sys.info()[["effective_user"]
 }
 
 
-pacman::p_load(knitr, tidyverse, openxlsx, rmarkdown, rvest)
+pacman::p_load(knitr, tidyverse, openxlsx, rmarkdown, rvest, shinydashboard)
 # setwd("C:/Users/fabio/Dropbox/postdoc/microdashboards/wtm_iq/")
 # setwd("..")
 # print(getwd())
@@ -24,7 +24,7 @@ render_it <- function(...) {
   
 }
 
-render_it <- possibly(render_it, otherwise = NULL)
+render_it <- purrr::possibly(render_it, otherwise = NULL)
 dir("_site", full.names = T) %>% keep(~str_detect(.x, "qmd")) %>% keep(~str_detect(.x, "qmd")) %>% walk(render_it)
 
 
