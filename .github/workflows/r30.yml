@@ -35,7 +35,9 @@ jobs:
           libcurl4-openssl-dev \
           libxml2-dev \
           libharfbuzz-dev \
-          libfribidi-dev
+          libfribidi-dev \
+          libudunits2-dev \
+          libgdal-dev
       - run: echo "🍏 This job's status is ${{ job.status }}."
       - name: "Install Packages"
         run: |
