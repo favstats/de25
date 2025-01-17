@@ -89,7 +89,7 @@ get_page_insights <- function (pageid, timeframe = "LAST_30_DAYS", lang = "en-GB
     message(out[[1]][["errors"]][["description"]])
     
     
-    if (!(Sys.info()[["effective_user"]] %in% c("fabio", "favstats"))) {
+    if (Sys.info()[["effective_user"]] %in% c("fabio", "favstats")) {
       beepr::beep(20)
       readline("Change VPN pls")
       out <- resp %>% httr2::resp_body_html() %>% rvest::html_element("p") %>%
@@ -209,7 +209,7 @@ if (Sys.info()[["effective_user"]] == "favstats" | Sys.info()[["effective_user"]
   tf <- "30"
 }
 
-jb <- get_page_insights("103875099042033", timeframe = glue::glue("LAST_7_DAYS"), include_info = "targeting_info") %>% as_tibble()
+jb <- get_page_insights("103875099042033", timeframe = glue::glue("LAST_90_DAYS"), include_info = "targeting_info") %>% as_tibble()
 
 new_ds <- jb %>% arrange(ds) %>% slice(1) %>% pull(ds)
 
@@ -317,7 +317,7 @@ scraper <- function(.x, time = "7") {
   # print(paste0(.x$page_name,": ", round(which(internal_page_ids$page_id == .x$page_id)/nrow(internal_page_ids)*100, 2)))
   
   yo <-
-    get_page_insights(.x$page_id, timeframe = glue::glue("LAST_90_DAYS"), include_info = "targeting_info") %>% 
+    get_page_insights(.x$page_id, timeframe = glue::glue("LAST_{time}_DAYS"), include_info = "targeting_info") %>% 
     mutate(tstamp = tstamp)
   
   if (nrow(yo) != 0) {
@@ -695,11 +695,11 @@ mark_list <- us_markers %>%
     
     # if(length(unique(arethesepagespresent$page_id))<1000){
     #   try({
-    #     
+    # 
     #     print("djt not found")
     #     djt_page <<- unique(last7$page_id) %>%
     #       setdiff(the_data$page_id) %>%
-    #       # djt_page <<- "380605622501418" %>% 
+    #       # djt_page <<- "380605622501418" %>%
     #       map_dfr_progress(
     #         ~{get_page_insights(.x, timeframe = thetframe, include_info = "targeting_info")},
     #         .progress = T
@@ -709,14 +709,14 @@ mark_list <- us_markers %>%
     #       left_join(all_dat) %>%
     #       mutate(tframe = parse_number(as.character(.x$tframe))) %>%
     #       mutate(total_spend_formatted = parse_number(as.character(total_spend_formatted)))
-    #     
+    # 
     #     the_data <- djt_page %>%
     #       bind_rows(the_data)
-    #     
-    #     present_now <- the_data %>% 
-    #       inner_join(arethesepagespresent %>% select(page_id)) %>% 
+    # 
+    #     present_now <- the_data %>%
+    #       inner_join(arethesepagespresent %>% select(page_id)) %>%
     #       distinct(page_id)
-    #     
+    # 
     #     print(nrow(present_now))
     #   })
     # }
