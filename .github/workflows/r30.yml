@@ -28,10 +28,11 @@ jobs:
           r-version: 'release'
       - name: Setup - Checkout repo
         uses: actions/checkout@v3
-      - name: Apt-get needed things
+      - name: Install System Dependencies
         run: |
+          sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
-          libssl-dev \
+          libssl1.1 \
           libcurl4-openssl-dev \
           libxml2-dev \
           libharfbuzz-dev \
