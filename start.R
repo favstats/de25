@@ -28,6 +28,11 @@ render_it <- function(...) {
 render_it <- purrr::possibly(render_it, otherwise = NULL)
 dir("_site", full.names = T) %>% keep(~str_detect(.x, "qmd")) %>% keep(~str_detect(.x, "qmd")) %>% walk(render_it)
 
+rmarkdown::render(
+  input = "_site/overview.Rmd", 
+  output_file = "overview.html", 
+  output_dir = "docs"
+)
 
 # here::i_am("elex.Rproj")
 # setwd("C:/Users/fabio/Dropbox/postdoc/elex/")
