@@ -251,8 +251,8 @@ get_table_dat <- function(x, var) {
 
 }
 # debugonce()
-the_table30 <- get_table_dat(election_dat30, party) %>%
-  arrange(desc(`Total Spend`))
+the_table30 <- get_table_dat(election_dat30, party)  %>%
+  arrange(desc(parse_number(`Total Spend`)))
 
 # print(the_table30)
 
