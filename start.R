@@ -2,7 +2,7 @@
   source("retrieve_targeting_data.R")
 # } else {
 
-  install.packages("pacman")
+  # install.packages("pacman")
 # }
 
   
