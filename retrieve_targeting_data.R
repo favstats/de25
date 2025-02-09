@@ -764,8 +764,8 @@ mark_list <- us_markers %>%
 # get_page_insights("153080620724", timeframe = "LAST_30_DAYS", include_info = "targeting_info") %>%
 #   as_tibble()
 # 
-da7 <- mark_list[[1]]
-da30 <- mark_list[[2]]
+da7 <- mark_list[[2]]
+da30 <- mark_list[[1]]
 # da90 <- mark_list[[3]]
 # 
 # da7 %>%  filter(page_id == "153080620724")
