@@ -44,10 +44,12 @@ aidat <- aidat %>%
 <!-- Welcome to the **CampAIgn Tracker**, your go-to platform for monitoring the use of AI-generated content in political campaigns. *For now*, our analysis focuses on *paid ads on Meta platorms* from official Germany party accounts providing insights into targeting strategies, spending patterns, and **the prevalence of AI-generated visuals and messages**.  -->
 
 
+> **Welcome to AI Content Tracking!** This is an old page where the team of the CampAIgn Tracker built a prototype during a hackathon of the Baden-Württemberg Stiftung. We are archiving this page, but if you want to see the **LIVE** version of this tool, please go here:
 
 
+> [campAIgntracker.de](https://www.campaigntracker.de)
 
-
+The hackathon, known as the [Politechathon](https://www.wahlexe.de/de/?utm_source=chatgpt.com), took place on December 14 and 15, 2024, at the Landesvertretung Baden-Württemberg in Berlin. Interdisciplinary teams collaborated to create solutions aimed at enhancing transparency in digital political campaigns. 
 
 
 

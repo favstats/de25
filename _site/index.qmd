@@ -1,501 +1,481 @@
 ---
-title: ""
-format:
+title: Overall Spending
+description-meta: "How do political parties chase your vote, what do they want to keep hidden, and how much money do they spend on it? In the lead-up to the elections, we monitor political microtargeting."
+format: 
   html:
-    theme: lumen
     page-layout: full
 ---
 
 ```{r setup, include=FALSE}
-# dir()
-# here::i_am("ep2024.Rproj")
-
-library(tidyverse)
-library(htmltools)
-
-knitr::opts_chunk$set(echo = F, message = F, warning = F)
+# here::i_am("wtm_gb.Rproj")
 
 # sets <- jsonlite::fromJSON(here::here("settings.json"))
+# 
+# sets$cntry <- "US"
 
-# source(here::here("party_utils.R"))
-print(getwd())
-try({
-  aidat <- readRDS("../data/aidat.rds")
-
-})
-
-try({
-  aidat <- readRDS("data/aidat.rds")
-
-})
+## Global options
+knitr::opts_chunk$set(
+    cache = F,
+    echo = F,
+    warning = F,
+    message = F,
+    cache.lazy = FALSE
+)
 
 
-library(glue)
-# write_csv(aidat, file = "../data/aidat.csv")
+pacman::p_load(htmltools, tidyverse, highcharter, gt, gtExtras, rvest)
 
-aidat <- aidat %>% 
-  filter(hash != "9b95c3d2aa6c6bbc56fc8f15410a6564") %>% 
-  filter(hash != "d96dfdb34aeb0f5a6f30ded2d5d0e648")
+options(scipen = 999)
+# print(getwd())
+# here::here("")
+# prCint(getwd())
+# hcoptslang <- getOption("highcharter.lang")
+# 
+# hcoptslang$shortMonths <- c("Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec")
+# 
+# options(highcharter.lang = hcoptslang)
 
+# setwd("C:/Users/favstats/Dropbox/postdoc/is24/")
+source(here::here("utils.R"))
+source(here::here("party_utils.R"))
+
+total_spend_id <- election_dat30 %>%
+    # filter(main_currency == the_currency) %>%
+  distinct(internal_id, .keep_all = T) %>%
+  group_by(party) %>%
+  summarize(total_spend_formatted = sum(total_spend_formatted)) %>%
+  ungroup()
+
+color_dat <- color_dat %>% 
+  mutate(colors = case_when(
+    colors == "orange" ~ "#f77604",
+    colors == "green" ~ "#7aba2d",
+    colors == "darkgray" ~ "#A9A9A9",
+    colors == "darkblue" ~ "#000080",
+    colors == "lightblue" ~ "#ADD8E6",
+    colors == "#ccc" ~ "#cccccc",
+    is.na(colors) ~ "#00BFFF",
+    T ~ colors
+  ))
+
+
+# election_dat30 %>% glimpse()
+# color_dat
+
+# election_dat30 %>% count(party)
+
+# election_dat7 %>% filter(internal_id == "153080620724")
+
+sets <- list(cntry = "DE")
 ```
 
-<!-- ### CampAIgn Tracker -->
-
-<!-- Welcome to the **CampAIgn Tracker**, your go-to platform for monitoring the use of AI-generated content in political campaigns. *For now*, our analysis focuses on *paid ads on Meta platorms* from official Germany party accounts providing insights into targeting strategies, spending patterns, and **the prevalence of AI-generated visuals and messages**.  -->
 
 
+```{r}
+sum30 <- election_dat30 %>%
+    # # filter(main_currency == the_currency) %>%
+    distinct(internal_id, .keep_all = T) %>%
+    summarize(total_spend_formatted = sum(total_spend_formatted),
+              total_num_ads = sum(total_num_ads))
+
+sum7 <- election_dat7 %>%
+    # # filter(main_currency == the_currency) %>%
+    distinct(internal_id, .keep_all = T) %>%
+    summarize(total_spend_formatted = sum(total_spend_formatted),
+              total_num_ads = sum(total_num_ads))
+
+add_ribbons <- function(x, adv, col) {
+   x %>%
+  # tab_options(table.width = pct(100)) %>%
+  tab_style(
+    style = cell_borders(
+      sides = c("left"),
+      color = col,
+      weight = px(18.5),
+      style = "solid"
+    ),
+    locations = cells_body(
+      columns = `Number of Advertisers`,
+      rows = adv
+    ))
+}
+
+add_ribbons2 <- function(x, adv, col) {
+   x %>%
+  # tab_options(table.width = pct(100)) %>%
+  tab_style(
+    style = cell_borders(
+      sides = c("left"),
+      color = col,
+      weight = px(18.5),
+      style = "solid"
+    ),
+    locations = cells_body(
+      columns = `Number of Ads`,
+      rows = adv
+    ))
+}
 
 
+add_ribbons3 <- function(x, adv, col) {
+   x %>%
+  # tab_options(table.width = pct(100)) %>%
+  tab_style(
+    style = cell_borders(
+      sides = c("left"),
+      color = col,
+      weight = px(18.5),
+      style = "solid"
+    ),
+    locations = cells_body(
+      columns = `Total Spend`,
+      rows = adv
+    ))
+}
+```
 
-
+Here you can see the expenditures of political parties in the lead-up to the elections according to the latest data.
 
 
 
 ::: {.panel-tabset}
 
+## Meta
 
-## Overall Statistics
+::: {.panel-tabset}
+
+### `r last30days_string`
+
+During this period, political parties spent a total of `r paste0(currency_symbol, scales::comma_format()(sum30$total_spend_formatted))` and displayed `r sum30$total_num_ads` advertisements on Meta (Facebook and Instagram).
+
 
 
 ```{r}
-library(shiny)
-library(shinydashboard)
-library(tidyverse)
-library(scales) # For formatting large numbers
-library(htmltools)
 
-# Helper function to format large numbers
-format_large_number <- function(x) {
-  case_when(
-    x >= 1e6 ~ paste0(round(x / 1e6, 1), "M"),  # Format millions
-    x >= 1e3 ~ paste0(round(x / 1e3, 1), "k"),  # Format thousands
-    TRUE ~ as.character(x)                     # Keep small numbers as-is
-  )
-}
-
-
-
-# Function to generate summary boxes with unique ads, spending, and impressions
-generate_summary_boxes <- function(data) {
-  # Summarize data
-  zerotohero <- data %>% 
-    distinct(hash, .keep_all = T) %>% 
-    group_by(ai) %>% 
-    summarize(unique_ads = n()) %>% 
-    ungroup()
+# paste('<a href="',myurl,'">',mytext,'</a>')
+get_table_dat <- function(data, group_var) {
   
-  summary_data <- data %>%
-    group_by(ai) %>%
+  library(dplyr)
+  library(tidyr)
+  library(glue)
+  library(stringr)
+  library(scales)
+  
+  # Ensure data consistency by keeping only distinct internal IDs
+  data <- data %>% distinct(internal_id, .keep_all = TRUE)
+  ssss <<- data 
+
+  # Step 1: Count total number of advertisers per party
+  total_ads <<- data %>%
+    group_by(party) %>%
+    summarize(total_num_ads = n(), .groups = "drop") %>%
+    drop_na() %>%
+    mutate(total_num_ads = comma(total_num_ads)) %>%
+    pivot_wider(names_from = {{ group_var }}, values_from = total_num_ads) %>%
+    mutate(party_col = "Number of Advertisers")
+  
+  # print("hello")
+  
+
+  # Step 2: Identify top spenders (Top 3 advertisers per party, ensuring at least 1)
+  top_spenders <<- ssss %>%
+    filter(!is.na(page_name) & !is.na(internal_id) & !is.na(total_spend_formatted)) %>% 
+    group_by(party) %>%
+        arrange(desc(total_spend_formatted)) %>%
+        slice(1:3) %>%
+        mutate(total_spend_formatted = scales::comma(total_spend_formatted)) %>%
+        mutate(n_words = str_count(page_name, " ")) %>%
+        mutate(
+          lab =  glue::glue('[||ppage_namep||](https://www.facebook.com/ads/library/?ad_type=political_and_issue_ads&country=||psets$cntryp||&view_all_page_id=||pinternal_idp||) (||pcurrency_symbolp||||ptotal_spend_formattedp||)', .open = "||p", .close = "p||")
+          ) %>%
+    drop_na(lab) %>%  # Remove empty results
+    select(party, lab) %>%
+    group_by(party) %>%
     summarize(
-      spend_lower = sum(spend_lower, na.rm = TRUE),
-      spend_upper = sum(spend_upper, na.rm = TRUE),
-      impressions_lower = sum(impressions_lower, na.rm = TRUE),
-      impressions_upper = sum(impressions_upper, na.rm = TRUE)
+      lab = ifelse(n() > 0, paste0("<br>", row_number(), ". ", lab, collapse = ""), "No top spenders available"),
+      .groups = "drop"
     ) %>%
-    arrange(desc(ai)) %>% 
-    left_join(zerotohero)
-    
-  
-  # Custom valueBox function
-  custom_value_box <- function(title, value, color) {
-    div(
-      style = glue("
-        background-color: {color}; 
-        color: black; 
-        padding: 10px; 
-        margin: 10px; 
-        border-radius: 8px; 
-        text-align: center; 
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        font-size: 1.2em;"),
-      strong(title), br(),
-      value
-    )
-  }
+    mutate(lab = paste0(lab, "<br><br>")) %>%
+    pivot_wider(names_from = party, values_from = lab) %>%
+    mutate(party_col = "Top Spenders")
+    # print("hello2")
 
-  # AI Content Section
-  ai_boxes <- tagList(
-    custom_value_box(
-      "FB & Instagram Ads",
-      format_large_number(summary_data$unique_ads[1]),
-      "#d9edf7" # Light blue for unique ads
-    ),
-    custom_value_box(
-      "Spending",
-      paste0("€", format_large_number(summary_data$spend_lower[1]), 
-             " - €", format_large_number(summary_data$spend_upper[1])),
-      "#f2f2f2"
-    ),
-    custom_value_box(
-      "Impressions",
-      paste0(format_large_number(summary_data$impressions_lower[1]), 
-             " - ", format_large_number(summary_data$impressions_upper[1])),
-      "#e6e6e6"
-    )
-  )
+  # Step 3: Calculate total number of ads per party
+  total_ads_count <<- data %>%
+    group_by(party) %>%
+    summarize(total_num_ads = sum(total_num_ads, na.rm = TRUE), .groups = "drop") %>%
+    drop_na() %>%
+    mutate(total_num_ads = comma(total_num_ads)) %>%
+    pivot_wider(names_from = {{ group_var }}, values_from = total_num_ads) %>%
+    mutate(party_col = "Number of Ads")
+      # print("hello3")
+
+  # Step 4: Calculate total spending per party
+  total_spend <<- data %>%
+    group_by(party) %>%
+    summarize(total_spend_formatted = sum(total_spend_formatted, na.rm = TRUE), .groups = "drop") %>%
+    mutate(total_spend_formatted = paste0(currency_symbol, comma(total_spend_formatted))) %>%
+    drop_na() %>%
+    pivot_wider(names_from = party, values_from = total_spend_formatted) %>%
+    mutate(party_col = "Total Spend")
+      # print("hello4")
+
+  # Combine all tables safely
+  final_table <- bind_rows(total_ads, top_spenders, total_ads_count, total_spend) %>%
+    t() %>%
+    as.data.frame() %>%
+    rownames_to_column("party_col") %>%
+    set_names(.[nrow(.), ] %>% as.character()) %>%
+    slice(1:(n() - 1))
   
-  # Non-AI Content Section
-  non_ai_boxes <- tagList(
-    custom_value_box(
-      "FB & Instagram Ads",
-      format_large_number(summary_data$unique_ads[2]),
-      "#d9edf7"
-    ),
-    custom_value_box(
-      "Spending",
-      paste0("€", format_large_number(summary_data$spend_lower[2]), 
-             " - €", format_large_number(summary_data$spend_upper[2])),
-      "#f2f2f2"
-    ),
-    custom_value_box(
-      "Impressions",
-      paste0(format_large_number(summary_data$impressions_lower[2]), 
-             " - ", format_large_number(summary_data$impressions_upper[2])),
-      "#e6e6e6"
-    )
-  )
-  
-  # Layout using CSS Grid
-  div(
-    style = "display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;",
-    div(
-      tags$h3("AI Content", style = "text-align: center; color: #333;"),
-      ai_boxes
-    ),
-    div(
-      tags$h3("Non-AI Content", style = "text-align: center; color: #333;"),
-      non_ai_boxes
-    )
-  )
+  return(final_table)
 }
+# debugonce()
+the_table30 <- get_table_dat(election_dat30, party)  %>%
+  mutate(xxx = parse_number(`Total Spend`)) %>% 
+  arrange(desc(xxx)) %>% 
+  select(-xxx)
 
-generate_summary_boxes(aidat)
-# debugonce(generate_summary_boxes)
-```
+# print(the_table30)
 
-<br>
+# # Generate the HTML but save it to a variable instead of directly outputting
+# gt_output <- gt(the_table30, rowname_col = 'party_col') %>%
+#   fmt_markdown(columns = everything()) %>%
+#   cols_align(align = "center") %>%
+#   gtExtras::gt_theme_538() %>%
+#   eval(parse(text = paste0(add_ribbons_code)))
+#
+# # Print the HTML code to check for errors
+# print(gt_output)
+#
+#
+add_ribbons_code <- the_table30 %>%
+  left_join(color_dat %>% mutate(party_col = party)) %>%
+  mutate(ribbons_code = sprintf("add_ribbons(\"%s\", \"%s\")", party_col, colors)) %>%
+  pull(ribbons_code) %>%
+  # paste(collapse = "\n") %>%
+  paste(collapse = "%>%")  # Add pipe after each ribbon
 
-<center>
+eval(parse(text = paste0("gt(the_table30, rowname_col = 'party_col') %>% fmt_markdown(columns = everything()) %>% cols_align(align = 'center') %>%  cols_align(align = \"left\", columns = `Top Spenders`) %>% gtExtras::gt_theme_538() %>% tab_style(style = 'vertical-align:center', locations = cells_body(columns = `Top Spenders`)) %>% ", add_ribbons_code)))
 
-*Timeframe: January 1st - December 13th 2024*
+ # gt(the_table30, rowname_col = 'party_col') %>%
+ #  fmt_markdown()
 
-Source: Meta Ad Library. We retrieved all *paid ads* from 160+ *official* German party accounts.
+# election_dat30$internal_id
 
-</center>
-
-
-## By Party
-
-### Unique AI Ads
-
-```{r}
-library(highcharter)
-library(tidyverse)
-
-tomerge <- aidat %>%
-  filter(ai == 1) %>% # Focus on AI ads
-  group_by(partei) %>%
-  summarize(
-    total_spend = sum(spend_lower, na.rm = TRUE),
-    impressions = sum(impressions_lower, na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
-  mutate(total_spend = ifelse(total_spend==50, 100, total_spend))
-
-# Step 1: Aggregate Data for AI Ads
-ai_data <- aidat %>%
-  distinct(hash, .keep_all = T) %>% 
-  filter(ai == 1) %>% 
-  group_by(partei) %>%
-  summarize(
-    total_n = n(),
-    # total_spend = sum(spend_lower, na.rm = TRUE),
-    # impressions = sum(impressions_lower, na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
-  # count(partei)# Focus on AI ads
-  left_join(tomerge) %>% 
-  mutate(total_spend = ifelse(total_spend==50, 100, total_spend)) %>% 
-  mutate(
-    dots = total_n, # Aggregate to €1000 per dot
-    dots = round(dots),        # Round to avoid fractional dots
-    col = case_when(           # Assign custom party colors
-      partei == "SPD" ~ "#EB001F",
-      partei == "B90/GRÜNE" ~ "#64A12D",
-      partei == "FDP" ~ "#FFED00",
-      partei == "CDU" ~ "#000000",
-      partei == "AfD" ~ "#009EE0",
-      partei == "CSU" ~ "#008AC5",
-      partei == "Piraten" ~ "#FFA500",
-      partei == "NPD" ~ "#d59e29",
-      TRUE ~ "#BE3075" # Default color
-    )
-  ) %>%
-  arrange(desc(total_spend)) # Sort by spending
-
-# Step 2: Highcharter Item Chart
-hchart(
-  ai_data %>% arrange(desc(dots)),
-  "item",
-  hcaes(
-    name = partei,
-    y = dots,      # Use dots to represent €1000 aggregated spending
-    label = partei,
-    color = col    # Custom colors for parties
-  ),
-  # name = "€100 Spending Blocks",
-  showInLegend = TRUE
-) %>%
-  hc_title(text = "Unique AI Ads by Political Parties (1 dot = 1 ad)") %>%
-  hc_tooltip(
-    useHTML = TRUE,
-    pointFormat = paste0(
-      "<b>{point.name}</b><br>",
-      "Total Spend: €{point.total_spend:,.0f}<br>",
-      "Impressions: {point.impressions:,.0f}"
-    )
-  ) %>%
-  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y} dots</span>') %>%
-  hc_credits(
-    enabled = TRUE,
-    text = "Source: Meta Ad Library and data compiled by Who Targets Me. Data Viz: Fabio Votta (@favstats)."
-  )
-
-
-```
-
-### Spending
-
-```{r}
-library(highcharter)
-library(tidyverse)
-
-# Step 1: Aggregate Data for AI Ads
-ai_data <- aidat %>%
-  filter(ai == 1) %>% # Focus on AI ads
-  group_by(partei) %>%
-  summarize(
-    total_spend = sum(spend_lower, na.rm = TRUE),
-    impressions = sum(impressions_lower, na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
-  mutate(total_spend = ifelse(total_spend==50, 100, total_spend)) %>% 
-  # count(partei)
-  mutate(
-    dots = total_spend / 100, # Aggregate to €1000 per dot
-    dots = round(dots),        # Round to avoid fractional dots
-    col = case_when(           # Assign custom party colors
-      partei == "SPD" ~ "#EB001F",
-      partei == "B90/GRÜNE" ~ "#64A12D",
-      partei == "FDP" ~ "#FFED00",
-      partei == "CDU" ~ "#000000",
-      partei == "AfD" ~ "#009EE0",
-      partei == "CSU" ~ "#008AC5",
-      partei == "Piraten" ~ "#FFA500",
-      partei == "NPD" ~ "#d59e29",
-      TRUE ~ "#BE3075" # Default color
-    )
-  ) %>%
-  arrange(desc(total_spend)) # Sort by spending
-
-# Step 2: Highcharter Item Chart
-hchart(
-  ai_data,
-  "item",
-  hcaes(
-    name = partei,
-    y = dots,      # Use dots to represent €1000 aggregated spending
-    label = partei,
-    color = col    # Custom colors for parties
-  ),
-  name = "€100 Spending Blocks",
-  showInLegend = TRUE
-) %>%
-  hc_title(text = "AI Ad Spending by Political Parties (€100 per Dot)") %>%
-  hc_tooltip(
-    useHTML = TRUE,
-    pointFormat = paste0(
-      "<b>{point.name}</b><br>",
-      "Total Spend: €{point.total_spend:,.0f}<br>",
-      "Impressions: {point.impressions:,.0f}"
-    )
-  ) %>%
-  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y} dots</span>') %>%
-  hc_credits(
-    enabled = TRUE,
-    text = "Source: Meta Ad Library and data compiled by Who Targets Me. Data Viz: Fabio Votta (@favstats)."
-  )
 
 
 ```
 
 
-## Content Exploring
-
-This only shows the top 3 ads in terms of impressions but future versions will include a browsable table!
-
-::: {.gallery}
-
-<!-- #2585232091623704-adid -->
 
 
-<div class="gallery-item">
 
-<img src="https://i.imgur.com/MIAnb4S.png" alt="Bild 1"/>
+### `r last7days_string`
 
-<p class="description">
-
--   **Impressionen:** 125 000 <br>
-
--   **Total Spend:** 500 €<br>
+During this period, political parties spent a total of `r paste0(currency_symbol, scales::comma_format()(sum7$total_spend_formatted))` and displayed `r sum7$total_num_ads` advertisements on Meta (Facebook and Instagram).
 
 
--   **Target Gender:** Women<br>
--   **Target Age:** All <br>
--   **Target Location:** Brandenburg <br>
 
-[More info on the ad: Ad Library Link](https://www.facebook.com/ads/library/?active_status=active&ad_type=political_and_issue_ads&country=DE&is_targeted_country=false&media_type=all&q=2585232091623704&search_type=keyword_unordered)
+```{r, eval = T}
 
-</p>
-
-</div>
+the_table7 <- get_table_dat(election_dat7, party)  %>%
+  mutate(xxx = parse_number(`Total Spend`)) %>% 
+  arrange(desc(xxx)) %>% 
+  select(-xxx)
 
 
-<div class="gallery-item">
-
-<img src="https://i.imgur.com/pSl9bjt.png" alt="Bild 2"/>
-
-<p class="description">
-
--   **Impressions:** 120 500<br>
-
--   **Total Spend:** 1300 €<br>
-
--   **Target Gender:** Men<br>
--   **Target Age:** All <br>
--   **Target Location:** Brandenburg <br>
-
-[More info on the ad: Ad Library Link](https://www.facebook.com/ads/library/?active_status=active&ad_type=political_and_issue_ads&country=DE&is_targeted_country=false&media_type=all&q=1024684215458526&search_type=keyword_unordered)
+add_ribbons_code <- the_table7 %>%
+  left_join(color_dat %>% mutate(party_col = party)) %>%
+  mutate(ribbons_code = sprintf("add_ribbons(\"%s\", \"%s\")", party_col, colors)) %>%
+  pull(ribbons_code) %>%
+  # paste(collapse = "\n") %>%
+  paste(collapse = "%>%")  # Add pipe after each ribbon
 
 
-</p>
+eval(parse(text = paste0("gt(the_table7, rowname_col = 'party_col') %>% fmt_markdown(columns = everything()) %>% cols_align(align = 'center') %>%  cols_align(align = \"left\", columns = `Top Spenders`) %>% gtExtras::gt_theme_538() %>% tab_style(style = 'vertical-align:center', locations = cells_body(columns = `Top Spenders`)) %>% ", add_ribbons_code)))
 
-</div>
-
-<div class="gallery-item">
-
-<img src="https://i.imgur.com/ocrCnnd.png" alt="Bild 3"/>
-
-<p class="description">
-
--   **Impressions:** 100 000<br>
-
--   **Total Spend:** 500 €<br>
-
--   **Target Gender:** Mixed<br>
--   **Target Age:** All <br>
--   **Target Location:** Brandenburg <br>
-
-[More info on the ad: Ad Library Link](https://www.facebook.com/ads/library/?active_status=active&ad_type=political_and_issue_ads&country=DE&is_targeted_country=false&media_type=all&q=808709021104029&search_type=keyword_unordered)
-
-
-</p>
-
-</div>
+```
 
 :::
 
 
+## Google
 
-## Methodology
+Work in Progress
+
+```{r, eval=F}
+# library(metatargetr)
+
+Romania_2024_google <- read_csv(here::here("data/Romania 2024 - google.csv"))
 
 
-<!-- Custom CSS -->
-<style>
-body {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f9f9f9;
-  margin: 0;
-}
+# days30ggl <- Romania_2024_google %>%
+#   drop_na(party) %>% 
+#   .$Advertiser_ID %>% 
+#   map_dfr(~{
+#     ggl_get_spending(
+#       advertiser_id = .x,
+#       start_date = "2024-11-02",
+#       end_date = "2024-12-01",
+#       cntry = "RO"
+#     ) %>% mutate_all(as.character)    
+#   }) %>% 
+#   mutate(Advertiser_ID = advertiser_id) %>% 
+#   left_join(Romania_2024_google)
+#   
+# saveRDS(days30ggl, "../data/days30ggl.rds")
 
-h1, h2 {
-  text-align: center;
-  color: #0056b3;
-}
-
-.section-container {
-  background-color: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  margin: 20px auto;
-  max-width: 800px;
-}
-
-.section-container p {
-  font-size: 1.1em;
-  text-align: justify;
-}
-
-.section-container strong {
-  color: #0073e6;
-}
-
-.button-container {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.button {
-  display: inline-block;
-  padding: 10px 20px;
-  font-size: 1em;
-  color: white;
-  background-color: #0073e6;
-  text-decoration: none;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s;
-}
-
-.button:hover {
-  background-color: #0056b3;
-}
-</style>
-
-<!-- Content -->
-<div class="section-container">
-  <h1>CampAIgn Tracker</h1>
+days30ggl <-  readRDS(here::here("data/days30ggl.rds"))
   
-  <h2>Daten</h2>
-  <p>
-    Für unseren <strong>CampAIgn Tracker</strong> greifen wir aktuell auf die offiziellen Partei-Accounts der deutschen Parteien zu und analysieren deren Beiträge, die sie als <strong>bezahlte Werbung</strong> ausgespielt haben. Dafür nutzen wir Metadaten zu <strong>Targeting, Spending</strong> und vielem mehr und kombinieren diese mit einer Auswertung der einzelnen Beiträge zum <strong>Einsatz von KI</strong>.
-  </p>
-</div>
+# the_table30 <- get_table_dat(days30ggl %>% mutate(internal_id = advertiser_id, total_spend_formatted= spend_RON, page_name = advertiser_name ), party) %>%
+#   arrange(desc(parse_number(`Total Spend`)))
 
-<div class="section-container">
-  <h2>Prozess</h2>
-  <p>
-    Wir setzen auf einem KI-Modell auf, welches <strong>automatisiert erkennt</strong>, wann Bilder und Videos mit KI bearbeitet oder erstellt wurden. Wir wissen, dass diese Detektoren keine <strong>100%ige Genauigkeit</strong> haben. Deshalb schließen wir eine <strong>manuelle Klassifizierung</strong> an, in der Codierer:innen die Beiträge nochmal prüfen. Somit stellen wir sicher, dass wir alle KI-Bilder zuverlässig erkennen.
-  </p>
-</div>
-
-<div class="section-container">
-  <h2>Bald verfügbar</h2>
-  <p>
-    Wir erweitern unseren <strong>CampAIgn Tracker</strong> kontinuierlich und werden bald nicht nur offizielle Partei-Accounts inkludieren, sondern <strong>60.000 weitere Accounts</strong> von politischen Akteur:innen in Deutschland. So ermöglichen wir ein <strong>Live-Tracking von KI-Inhalten</strong> bei den nächsten Wahlen.
-  </p>
-</div>
-
-<div class="section-container button-container">
-  <a href="mailto:research@yourorganization.de" class="button">Kontaktieren Sie unsere Wissenschaftler:innen!</a>
-</div>
-
-
-::: 
+the_table30 <- days30ggl %>% 
+  as_tibble() %>% 
+  mutate(number_of_ads = as.numeric(number_of_ads)) %>% 
+  mutate(spend_RON = as.numeric(spend_RON)) %>% 
+  group_by(party) %>% 
+  summarise(`Number of Advertisers` = n(),
+            spend_RON = sum(spend_RON),
+            number_of_ads = sum(number_of_ads)) %>% 
+  mutate(party_col = party) %>% 
+  left_join(all_dat %>% distinct(party, entities.name) %>% drop_na(entities.name
+)) %>% 
+  mutate(party_col = entities.name) %>% 
+  mutate(party_col = ifelse(is.na(party_col), party, party_col)) %>% 
+  select(-party) %>% 
+  select(-entities.name)  %>%
+  drop_na(party_col) %>% 
+  arrange(desc(spend_RON)) %>%
+  mutate(`Total Spend` = scales::comma(spend_RON)) %>%
+  mutate(`Number of Ads` = scales::comma(number_of_ads)) %>% 
+  select(-spend_RON, -number_of_ads)
 
 
+sum30 <- days30ggl %>% 
+  as_tibble() %>% 
+  mutate(number_of_ads = as.numeric(number_of_ads)) %>% 
+  mutate(spend_RON = as.numeric(spend_RON)) %>% 
+  group_by(party) %>% 
+  summarise(`Number of Advertisers` = n(),
+            spend_RON = sum(spend_RON),
+            number_of_ads = sum(number_of_ads)) %>% 
+  mutate(party_col = party)  %>%
+    # # filter(main_currency == the_currency) %>%
+    # distinct(internal_id, .keep_all = T) %>%
+    summarize(total_spend_formatted = sum(spend_RON, na.rm = T),
+              total_num_ads = sum(number_of_ads))
 
 
+
+# days7ggl <- Romania_2024_google %>%
+#   drop_na(party) %>% 
+#   .$Advertiser_ID %>% 
+#   map_dfr(~{
+#     ggl_get_spending(
+#       advertiser_id = .x,
+#       start_date = "2024-11-25",
+#       end_date = "2024-12-01",
+#       cntry = "RO"
+#     ) %>% mutate_all(as.character)    
+#   }) %>% 
+#   mutate(Advertiser_ID = advertiser_id) %>% 
+#   left_join(Romania_2024_google)
+#   
+# saveRDS(days7ggl, "data/days7ggl.rds")
+  
+days7ggl <-  readRDS(here::here("data/days7ggl.rds"))
+
+# the_table7 <- get_table_dat(days7ggl %>% mutate(internal_id = advertiser_id, total_spend_formatted= spend_RON, page_name = advertiser_name ), party) %>%
+#   arrange(desc(parse_number(`Total Spend`)))
+
+the_table7 <- days7ggl %>% 
+  as_tibble() %>% 
+  mutate(number_of_ads = as.numeric(number_of_ads)) %>% 
+  mutate(spend_RON = as.numeric(spend_RON)) %>% 
+  group_by(party) %>% 
+  summarise(`Number of Advertisers` = n(),
+            spend_RON = sum(spend_RON),
+            number_of_ads = sum(number_of_ads)) %>% 
+  mutate(party_col = party) %>% 
+  left_join(all_dat %>% distinct(party, entities.name) %>% drop_na(entities.name
+)) %>% 
+  mutate(party_col = entities.name) %>% 
+  mutate(party_col = ifelse(is.na(party_col), party, party_col)) %>% 
+  select(-party) %>% 
+  select(-entities.name)  %>%
+  drop_na(party_col) %>% 
+  arrange(desc(spend_RON)) %>%
+  mutate(`Total Spend` = scales::comma(spend_RON)) %>%
+  mutate(`Number of Ads` = scales::comma(number_of_ads)) %>% 
+  select(-spend_RON, -number_of_ads)
+
+sum7 <- days7ggl %>% 
+  as_tibble() %>% 
+  mutate(number_of_ads = as.numeric(number_of_ads)) %>% 
+  mutate(spend_RON = as.numeric(spend_RON)) %>% 
+  group_by(party) %>% 
+  summarise(`Number of Advertisers` = n(),
+            spend_RON = sum(spend_RON),
+            number_of_ads = sum(number_of_ads)) %>% 
+  mutate(party_col = party)  %>%
+    # # filter(main_currency == the_currency) %>%
+    # distinct(internal_id, .keep_all = T) %>%
+    summarize(total_spend_formatted = sum(spend_RON, na.rm = T),
+              total_num_ads = sum(number_of_ads))
+
+```
+
+
+::: {.panel-tabset}
+
+### `r last30days_string`
+
+During this period, political parties spent a total of `r paste0(currency_symbol, scales::comma_format()(sum30$total_spend_formatted))` and displayed `r sum30$total_num_ads` advertisements on Google.
+
+
+```{r}
+
+
+add_ribbons_code <- the_table30 %>%
+  left_join(color_dat %>% rename(party_col = party)) %>%
+  drop_na(party_col) %>% 
+  mutate(colors = ifelse(is.na(colors), "#000000", colors)) %>% 
+  mutate(ribbons_code = sprintf("add_ribbons(\"%s\", \"%s\")", party_col, colors)) %>%
+  pull(ribbons_code) %>%
+  # paste(collapse = "\n") %>%
+  paste(collapse = "%>%")  # Add pipe after each ribbon
+
+
+eval(parse(text = paste0("gt(the_table30, rowname_col = 'party_col') %>% fmt_markdown(columns = everything()) %>% cols_align(align = 'center') %>% gtExtras::gt_theme_538() %>% ", add_ribbons_code)))
+```
+
+
+
+
+### `r last7days_string`
+
+During this period, political parties spent a total of `r paste0(currency_symbol, scales::comma_format()(sum7$total_spend_formatted))` and displayed `r sum7$total_num_ads` advertisements on Google.
+
+
+```{r}
+
+add_ribbons_code <- the_table7 %>%
+  left_join(color_dat %>% rename(party_col = party)) %>%
+  drop_na(party_col) %>% 
+  mutate(colors = ifelse(is.na(colors), "#000000", colors)) %>% 
+  mutate(ribbons_code = sprintf("add_ribbons(\"%s\", \"%s\")", party_col, colors)) %>%
+  pull(ribbons_code) %>%
+  # paste(collapse = "\n") %>%
+  paste(collapse = "%>%")  # Add pipe after each ribbon
+
+
+eval(parse(text = paste0("gt(the_table7, rowname_col = 'party_col') %>% fmt_markdown(columns = everything()) %>% cols_align(align = 'center') %>% gtExtras::gt_theme_538() %>% ", add_ribbons_code)))
+```
+
+
+:::
+
+
+:::
