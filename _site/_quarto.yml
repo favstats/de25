@@ -10,11 +10,12 @@ website:
     left:
       - href: index.qmd
         text: "{{< iconify ph coins >}} Spending"
-      - href: ai.qmd
-        text: "{{< iconify ph star-four-light >}} AI Content Tracker"
       - sidebar:targeting
       - href: about.qmd
         text: "{{< iconify ph info-thin >}} About"
+    right:
+      - href: ai.qmd
+        text: "{{< iconify ph star-four-light >}} AI Content Tracker"
   sidebar:
     - id: ""
     - id: targeting
