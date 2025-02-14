@@ -49,7 +49,7 @@ aidat <- aidat %>%
 
 > [campAIgntracker.de](https://www.campaigntracker.de)
 
-The hackathon, known as the [Politechathon](https://www.wahlexe.de/de/?utm_source=chatgpt.com), took place on December 14 and 15, 2024, at the Landesvertretung Baden-Württemberg in Berlin. Interdisciplinary teams collaborated to create solutions aimed at enhancing transparency in digital political campaigns. 
+The hackathon, known as the [Politechathon](https://www.wahlexe.de/de/?utm_source=chatgpt.com), took place on December 14 and 15, 2024, at the Landesvertretung Baden-Württemberg in Berlin. 
 
 
 
