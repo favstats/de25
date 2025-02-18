@@ -87,7 +87,118 @@ region_dat <- election_dat30 %>%
   ungroup() %>%
   rename(region = value) %>%
   mutate(region = str_remove_all(region, ", Germany"))
+```
 
+```{r, eval = F}
+
+apexcharter::apex(region_dat, aes(x = party, fill = region), "treemap")
+
+
+hctreemap(tm, allowDrillToNode = TRUE, layoutAlgorithm = "squarified") %>%
+  hc_title(text = "Gross National Income World Data") %>%
+  hc_tooltip(pointFormat = "<b>{point.name}</b>:<br>
+                             Pop: {point.value:,.0f}<br>
+                             GNI: {point.valuecolor:,.0f}")
+
+
+```
+
+```{r, eval = F}
+library(dplyr)
+library(highcharter)
+
+# # Your data (replace with your actual data frame name)
+# spend_data <- tibble::tribble(
+#   ~party, ~region, ~total_spend_formatted,
+#   "AfD", "Bayern", 371.9965206,
+#   "SPD", "Bayern", 751.8980756,
+#   "AfD", "Brandenburg", 0.8980756,
+#   "AfD", "Hessen", 2795.6271454,
+#   "AfD", "Mecklenburg-Vorpommern", 2437.3026131,
+#   "AfD", "Niedersachsen", 240.0000000
+# )
+# 
+# # Add party colors (customize these hex codes as needed)
+# party_colors <- c(
+#   "AfD" = "#005ea4",
+#   "SPD" = "#ff0000"
+# )
+
+spend_data <- region_dat %>%
+  group_by(party, region) %>%
+  summarize(total_spend_formatted = sum(total_spend_formatted)) %>%
+  ungroup() %>%
+  mutate(party = fct_relevel(party)) %>%
+  left_join(color_dat) %>% 
+  rename(party_color = colors) %>% 
+  arrange(party_color)
+
+# spend_data <- spend_data |> 
+#   mutate(party_color = party_colors[party])
+
+# Level styling options (same as example)
+lvl_opts <- list(
+  list(
+    level = 1,
+    borderWidth = 0,
+    borderColor = "transparent",
+    dataLabels = list(
+      enabled = TRUE,
+      align = "left",
+      verticalAlign = "top",
+      style = list(
+        fontSize = "12px", 
+        textOutline = FALSE,
+        color = "white",
+        fontWeight = "normal"
+      )
+    )
+  ),
+  list(
+    level = 2,
+    borderWidth = 0,
+    borderColor = "transparent",
+    colorVariation = list(key = "brightness", to = 0.250),
+    dataLabels = list(enabled = FALSE),
+    style = list(
+      fontSize = "8px",
+      textOutline = FALSE, 
+      color = "white", 
+      fontWeight = "normal"
+    )
+  )
+)
+
+# Create hierarchical data structure
+hierarchical_data <- data_to_hierarchical(
+  spend_data,
+  group_vars = c(party, region),
+  size_var = total_spend_formatted,
+  colors = unique(spend_data$party_color)
+)
+
+# Create the treemap
+hchart(
+  hierarchical_data,
+  type = "treemap",
+  allowDrillToNode = TRUE,
+  levels = lvl_opts,
+  tooltip = list(
+    pointFormat = "<b>{point.name}</b>: {point.value:,.2f}€",
+    valueDecimals = 2
+  )
+) |> 
+  hc_chart(
+    style = list(fontFamily = "Arial")
+  ) |> 
+  hc_title(
+    text = "Political Spending by Party and Region"
+  ) |> 
+  hc_size(height = 700)
+```
+
+
+```{r,fig.width=10, fig.height=8, echo = F}
 the_colors <- region_dat %>%
   group_by(party) %>%
   summarize(total_spend_formatted = sum(total_spend_formatted)) %>%
@@ -269,7 +380,8 @@ region_dat <- election_dat30 %>%
             num_ads = sum(num_ads)) %>%
   ungroup() %>%
   rename(region = value) %>%
-  mutate(region = str_remove_all(region, ", Germany"))
+  mutate(region = str_remove_all(region, ", Germany")) %>% 
+  filter(!(party == "CDU" & region == "Bayern"))
 
 the_colors <- region_dat %>%
   group_by(party) %>%
@@ -306,6 +418,7 @@ if(nrow(region_dat)!=0) {
 }
 #
 
+# region_dat %>% count(party)
 ```
 
 
