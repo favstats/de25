@@ -46,7 +46,12 @@ color_dat <- color_dat %>%
   ))
 
 
+locating_targeting <- election_dat30 %>%
+  select(tstamp:ds, party)%>%
+  filter(type == "location") %>%
+  as_tibble()
 
+write_csv(locating_targeting, file = "../data/locating_targeting.csv")
 ```
 
 
