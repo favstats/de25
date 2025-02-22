@@ -245,6 +245,6 @@ if (Sys.info()[["effective_user"]] == "favstats" | Sys.info()[["effective_user"]
   # system("git push")
   gert::git_add(".")
   gert::git_commit("update")
-  gert::git_push()
+  gert::git_push(force = T)
 }
 
