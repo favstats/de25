@@ -1,13 +1,13 @@
 ---
-  title: "Location"
+title: "Location"
 description-meta: "How do political parties chase your vote, what do they want to keep hidden, and how much money do they spend on it? In the lead-up to the elections, we monitor political microtargeting."
 format:
   html:
-  page-layout: full
+    page-layout: full
 ---
   
   
-  ```{r setup, include=FALSE}
+```{r setup, include=FALSE}
 # here::i_am("wtm_gb.Rproj")
 
 ## Global options
@@ -66,6 +66,7 @@ The chart below displays the geographical targeting of that political parties on
 
 
 
+
 ```{js}
 // Custom range filter with value label
 function rangeFilter(column, state) {
@@ -80,7 +81,7 @@ function rangeFilter(column, state) {
       max = Math.ceil(value)
     }
   })
-  
+
   const filterValue = column.filterValue || min
   const input = React.createElement('input', {
     type: 'range',
@@ -94,7 +95,7 @@ function rangeFilter(column, state) {
     style: { width: '100%', marginRight: '8px' },
     'aria-label': 'Filter ' + column.name
   })
-  
+
   return React.createElement(
     'div',
     { style: { display: 'flex', alignItems: 'center', height: '100%' } },
@@ -153,10 +154,10 @@ htmltools::browsable(
       columns = list(
         amount_spent = colDef(
           name = "💰 Spending",
-          format = colFormat(prefix = "$", separators = TRUE, digits = 0),
-          filterMethod = JS("filterMinValue"),
-          filterInput = JS("rangeFilter"),
-          filterable = TRUE
+          format = colFormat(prefix = "€", separators = TRUE, digits = 0),
+          # filterMethod = JS("filterMinValue"),
+          # filterInput = JS("rangeFilter"),
+          # filterable = TRUE
           # style = function(value) {
           #   # normalized <- (value - min(value)) / (max(value) - min(value))
           #   # background <- rgb(colorRamp(c("#e3f2fd", "#2196f3"))(normalized), maxColorValue = 255)
@@ -258,9 +259,9 @@ htmltools::browsable(
               value  # Display the original value, not value_clean
             )
           },
-          filterable = TRUE,
-          filterMethod = JS("filterMinValue"),
-          filterInput = JS("rangeFilter")
+          # filterable = TRUE,
+          # filterMethod = JS("filterMinValue"),
+          # filterInput = JS("rangeFilter")
         ),
         # is_exclusion = colDef(
         #   name = "🚫 Exclusion",
@@ -534,11 +535,11 @@ if(nrow(region_dat)!=0) {
 
 :::
   
-  :::
+:::
   
-  ## Geographical Exclusion
+## Geographical Exclusion
   
-  The following graphs depict the geographic locations that certain political advertisements will exclude on Meta, along with the amounts that parties spent on these exclusions.
+The following graphs depict the geographic locations that certain political advertisements will exclude on Meta, along with the amounts that parties spent on these exclusions.
 
 
 
@@ -578,10 +579,10 @@ htmltools::browsable(
       columns = list(
         amount_spent = colDef(
           name = "💰 Spending",
-          format = colFormat(prefix = "$", separators = TRUE, digits = 0),
-          filterMethod = JS("filterMinValue"),
-          filterInput = JS("rangeFilter"),
-          filterable = TRUE
+          format = colFormat(prefix = "€", separators = TRUE, digits = 0),
+          # filterMethod = JS("filterMinValue"),
+          # filterInput = JS("rangeFilter"),
+          # filterable = TRUE
           # style = function(value) {
           #   # normalized <- (value - min(value)) / (max(value) - min(value))
           #   # background <- rgb(colorRamp(c("#e3f2fd", "#2196f3"))(normalized), maxColorValue = 255)
@@ -683,9 +684,9 @@ htmltools::browsable(
               value  # Display the original value, not value_clean
             )
           },
-          filterable = TRUE,
-          filterMethod = JS("filterMinValue"),
-          filterInput = JS("rangeFilter")
+          # filterable = TRUE,
+          # filterMethod = JS("filterMinValue"),
+          # filterInput = JS("rangeFilter")
         ),
         # is_exclusion = colDef(
         #   name = "🚫 Exclusion",
@@ -780,7 +781,7 @@ htmltools::browsable(
     ),
     tags$button(
       tagList(fontawesome::fa("download"), "Download as CSV"),
-      onclick = "Reactable.downloadDataCSV('elex2', 'targeting.csv')"
+      onclick = "Reactable.downloadDataCSV('elex2', 'exclusion.csv')"
     )
   )
 )
@@ -919,6 +920,6 @@ if(nrow(region_dat)!=0) {
 
 :::
   
-  :::
+:::
   
   
