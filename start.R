@@ -238,6 +238,9 @@ rmarkdown::render(
 #   })
 # 
 if (Sys.info()[["effective_user"]] == "favstats" | Sys.info()[["effective_user"]] == "favoo") {
+  
+  gert::git_add(".")
+  gert::git_commit("update")
   system("git pull")
   gert::git_pull()
   # system("git add -A")
