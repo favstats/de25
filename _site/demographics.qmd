@@ -38,6 +38,175 @@ source(here::here("party_utils.R"))
 
 ## Age
 
+```{r}
+
+library(apexcharter)
+
+paid <- readRDS("../data/paid.rds")
+lookup_parties <- readRDS("../data/lookup_parties (1).rds")
+
+gender_breakdowns <- paid %>% 
+  left_join(lookup_parties) %>% 
+  filter(!is.na(party)) %>% 
+  select(id, party, age_country_gender_reach_breakdown) %>% 
+  # rowwise() %>% 
+  tidyr::unnest_longer(age_country_gender_reach_breakdown) %>% 
+  tidyr::unnest_wider(age_country_gender_reach_breakdown)%>% 
+  # slice(1:1000) %>%
+  tidyr::unnest_longer(age_gender_breakdowns)%>% 
+  # rowwise() %>% 
+  tidyr::unnest_wider(age_gender_breakdowns) %>% 
+  # tidyr::unnest_longer(age_gender_breakdowns) %>% 
+    mutate(party = case_when(
+      party == "AFD" ~ "AfD",
+      party == "BüSo – Bürgerrechtsbewegung Solidarität" ~ "BüSo",
+      party %in% c("CDU", "CSU") ~ "CDU/CSU",
+      party %in% c("MLPD – Marxistisch-Leninistische Partei Deutschlands") ~ "MLPD",
+      party %in% c("Piratenpartei Deutschland", "Piratenpartei") ~ "Piratenpartei",
+      party %in% c("SSW - Südschleswiger Wählerverband") ~ "SSW",
+      party %in% c("V-Partei³ - Partei für Veränderung, Vegetarier und Veganer") ~ "V-Partei³",
+      str_detect(party, "ÖDP") ~ "ÖDP",
+      str_detect(party, "PdF") ~ "PdF",
+      str_detect(party, "Tierschutzpartei") ~ "Tierschutzpartei",
+      str_detect(party, "Freie Wähler") ~ "Freie Wähler",
+      T ~party
+    )) 
+
+  
+  
+  
+  
+  library(ggplot2)
+  library(dplyr)
+  library(forcats)
+  
+  df <- gender_breakdowns %>%
+    filter(country == "DE") %>%
+    mutate(male = ifelse(is.na(male), 0, male),
+           female = ifelse(is.na(female), 0, female)) %>%
+    mutate(unknown = ifelse(is.na(unknown), 0, unknown)) %>% 
+    group_by(party, age_range) %>% 
+    summarize(male = sum(male),
+              female = sum(female),
+              unknown = sum(unknown)) %>% 
+    group_by(party) %>% 
+    mutate(total = sum(male+female+unknown)) %>% 
+    mutate(
+      male_perc = male / total * 100,
+      female_perc = female / total * 100
+    ) %>%
+    ungroup()
+  
+  
+  # "Alle Altersgruppen" als Durchschnitt hinzufügen
+  df_all <- df %>%
+    group_by(party) %>%
+    summarize(age_range = "All Ages",
+              total = unique(total),
+              male = sum(male),
+              female = sum(female)) %>% 
+    mutate(male_perc = male / total * 100,
+              female_perc = female / total * 100)
+  
+  df_it <- bind_rows(df, df_all)
+  
+gender_apex <- df_it %>%
+   group_by(party, age_range) %>%
+   summarize(#age_range = "Alle Altersgruppen",
+             total = sum(male+female),
+             male = sum(male),
+             female = sum(female)) %>% 
+   mutate(male_perc = male / total * 100,
+          female_perc = female / total * 100)  %>% 
+   select(party, male_perc, female_perc, age_range) %>% 
+   as_tibble() %>% 
+   mutate(party = forcats::fct_reorder(party, female_perc)) %>% 
+   gather(value, key, -party, -age_range) %>%
+  mutate(key = ifelse(value == "male_perc", -key, key)) %>% 
+  mutate(value = case_when(
+    value == "male_perc" ~ "Men",
+    value == "female_perc" ~ "Women"
+    )) %>% 
+  filter(age_range != "Unknown")
+```
+
+```{r}
+generate_pyramids <- function(partyyy) {
+
+gender_apex %>% 
+  filter(party %in% partyyy) %>% 
+  # Create Population Pyramid Chart
+  apex(
+    # data = population_data_long,
+    type = "bar",
+    mapping = aes(x = age_range, y = key, fill = value)
+  ) %>%
+    ax_chart(stacked = TRUE, horizontal = TRUE) %>%
+    ax_colors(c("#008080", "#FF6F61")) %>%  # Blue for males, Pink for females
+  ax_xaxis(
+    title = list(
+      text = "⬅️ More Male Audience | More Female Audience ➡️",  # Arrows for clarity
+      style = list(fontSize = "16px", fontWeight = "bold")
+    ),
+    min = -100,
+    max = 100,
+    labels = list(formatter = htmlwidgets::JS("function(val) { return Math.abs(val); }"))
+  ) %>%
+    ax_yaxis(
+      title = list(text = "Age Group")
+    )  %>%
+  # ax_tooltip(
+  #   shared = FALSE,
+  #   y = list(formatter = htmlwidgets::JS("
+  #     function(val, { seriesIndex, dataPointIndex, w }) {
+  #       let gender = w.globals.seriesNames[seriesIndex];
+  #       let absVal = Math.abs(val).toFixed(0);  // Rounds to whole number
+  #       return `: <span style='font-size:16px; color:#000;'>${absVal}% reached</span>`;
+  #     }
+  #   "))
+  # ) %>%
+    ax_title(text = partyyy, align = "center") 
+
+}
+
+
+
+# Generate plots
+plots <- gender_apex %>% pull(party) %>% unique() %>% map(generate_pyramids)
+
+if(length(plots)!=0){
+
+  # Map each plot to a column
+columns <- map(plots, ~ div(style = "width: 50%; float: left;", .x))
+
+# If there's an odd number of plots, add an empty div to the end to balance the columns
+if (length(columns) %% 2 == 1) {
+  columns <- c(columns, list(div(style = "width: 50%; float: left;")))
+}
+
+# Pair up the columns and wrap them in rows
+rows <- map(seq(from = 1, to = length(columns), by = 2), ~ {
+  div(class = "row",
+    list(
+      columns[[.x]],
+      columns[[.x + 1]]
+    )
+  )
+})
+
+# Print the rows
+tags$div(class = "container", do.call(tags$div, rows))
+
+
+
+}  else {
+  shiny::HTML("No data (yet).")
+}
+
+```
+
+
+> WARNING: The age targeting data BELOW is currently FAULTY on the end of Meta. It shows no age targeting even though there is. This page does NOT reflect age targeting as of now. We are waiting on Meta to fix this. As replacement for now ABOVE you can see the exposure data of the gender breakdown of who SAW ads by which party.
 
 The following graphs illustrate how parties target different age groups and the percentage of the budget allocated to them.
 
