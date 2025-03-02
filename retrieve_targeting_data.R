@@ -690,7 +690,8 @@ if (!exists("last7")) {
 #   mutate(total_spend_formatted = parse_number(as.character(total_spend_formatted)))
 
 
-
+us_markers <- tibble(cntry = "DE", ds = "2025-02-24", tframe = c("last_30_days",
+                                                                 "last_7_days"))
 
 mark_list <- us_markers %>% 
   mutate(tframe = fct_relevel(tframe, c("last_30_days",
